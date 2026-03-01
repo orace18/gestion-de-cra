@@ -29,7 +29,7 @@ API REST backend pour la gestion des Comptes Rendus d'Activité (CRA) des consul
 
 ```bash
 # Cloner le projet
-git clone <https://github.com/orace18/gestion-de-cra.git>
+git clone https://github.com/orace18/gestion-de-cra.git
 cd cra
 
 # Lancer l'application
@@ -60,7 +60,7 @@ Les comptes suivants sont créés automatiquement au démarrage :
 
 | Email | Mot de passe | Rôle |
 |---|---|---|
-| admin@cbx.fr | admin123 | Admin |
+| admin@cbx.com | admin123 | Admin |
 
 
 ---
@@ -75,7 +75,7 @@ POST /api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@cbx.fr",
+  "email": "admin@cbx.com",
   "password": "admin123"
 }
 ```
