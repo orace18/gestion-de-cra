@@ -5,7 +5,6 @@ import com.orace.cra.domain.model.enums.Role;
 import com.orace.cra.domain.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,7 @@ public class DataInitializer implements CommandLineRunner {
     private static final String ADMIN_EMAIL = "admin@cbx.com";
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {

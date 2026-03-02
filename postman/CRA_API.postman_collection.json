@@ -1,0 +1,628 @@
+{
+  "info": {
+    "_postman_id": "55885cef-8a3d-4882-a98e-ab14ad7e322d",
+    "name": "CRA API - Complete Tests",
+    "description": "Collection complete des endpoints CRA.\n\nPre-requis importants:\n1) Connecte-toi d'abord avec 'Login Admin' pour remplir {{admin_token}} automatiquement.\n2) Les endpoints /api/cra/** exigent un token ROLE_COLLABORATEUR ({{collaborateur_token}}).\n3) Regle metier: la saisie CRA (remplir/update/soumettre) est autorisee uniquement entre le 22 et le 28 (timezone Europe/Paris), sauf cas REJECTED.\n4) L'endpoint de creation collaborateur ne renvoie pas de mot de passe utilisable pour login: renseigne manuellement {{collaborateur_token}} si besoin, ou configure un compte collaborateur de test dans la base.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Auth",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data.token) { pm.environment.set('admin_token', data.token); }",
+                  "if (data.role) { pm.environment.set('admin_role', data.role); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Recupere et stocke automatiquement {{admin_token}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Collaborateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data.token) { pm.environment.set('collaborateur_token', data.token); }",
+                  "if (data.role) { pm.environment.set('collaborateur_role', data.role); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{collaborateur_email}}\",\n  \"password\": \"{{collaborateur_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Recupere et stocke automatiquement {{collaborateur_token}}."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 - Admin / Collaborateurs",
+      "item": [
+        {
+          "name": "Lister Collaborateurs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/collaborateurs"
+          },
+          "response": []
+        },
+        {
+          "name": "Creer Collaborateur",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('collaborateur_email', 'collab.' + Date.now() + '@cbx.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data.id) { pm.environment.set('collaborateur_id', String(data.id)); }",
+                  "if (data.email) { pm.environment.set('collaborateur_email', data.email); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Jean\",\n  \"email\": \"{{collaborateur_email}}\",\n  \"contrat\": \"CDI\",\n  \"seniorite\": \"JUNIOR\",\n  \"salaire\": \"35000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/collaborateurs"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Collaborateur By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/collaborateurs/{{collaborateur_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Collaborateur",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Jeanne\",\n  \"email\": \"{{collaborateur_email}}\",\n  \"contrat\": \"PORTAGE\",\n  \"seniorite\": \"CONFIRME\",\n  \"salaire\": \"42000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/collaborateurs/{{collaborateur_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Activation Collaborateur",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/collaborateurs/{{collaborateur_id}}/activation"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "20 - Admin / Missions",
+      "item": [
+        {
+          "name": "Lister Missions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/missions"
+          },
+          "response": []
+        },
+        {
+          "name": "Creer Mission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data.id) { pm.environment.set('mission_id', String(data.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Mission Client A\",\n  \"description\": \"Developpement et support\",\n  \"motif\": \"Renfort equipe\",\n  \"dateDebut\": \"2026-03-01\",\n  \"dateFin\": \"2026-12-31\",\n  \"tjm\": 550\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/missions"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Mission By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/missions/{{mission_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Mission",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Mission Client A - Update\",\n  \"description\": \"Developpement, support et run\",\n  \"motif\": \"Extension\",\n  \"dateDebut\": \"2026-03-01\",\n  \"dateFin\": \"2026-12-31\",\n  \"tjm\": 600\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/missions/{{mission_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Affecter Mission a Collaborateur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collaborateurId\": {{collaborateur_id}},\n  \"missionId\": {{mission_id}},\n  \"dateDebut\": \"2026-03-01\",\n  \"dateFin\": \"2026-12-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/missions/assign"
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer Mission",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/missions/{{mission_id}}",
+            "description": "A executer en dernier si tu veux nettoyer les donnees de test."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "30 - CRA Collaborateur (ROLE_COLLABORATEUR)",
+      "item": [
+        {
+          "name": "Get Mon CRA (mois/annee)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data.id) { pm.environment.set('cra_id', String(data.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cra?mois={{mois}}&annee={{annee}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Mes CRAs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cra/mes-cras"
+          },
+          "response": []
+        },
+        {
+          "name": "Remplir Mois",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cra/{{cra_id}}/remplir-mois",
+            "description": "Regle metier: possible entre le 22 et le 28 (Europe/Paris), sauf statut REJECTED."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Jour CRA",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"{{jour_date}}\",\n  \"type\": \"TRAVAILLE\",\n  \"valeur\": 1.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/cra/{{cra_id}}/jour"
+          },
+          "response": []
+        },
+        {
+          "name": "Soumettre CRA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cra/{{cra_id}}/soumettre"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "40 - CRA Admin Validation",
+      "item": [
+        {
+          "name": "Lister CRAs a valider",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/cra/a-valider"
+          },
+          "response": []
+        },
+        {
+          "name": "Lister tous les CRAs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/cra"
+          },
+          "response": []
+        },
+        {
+          "name": "Approuver CRA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/cra/{{cra_id}}/approuver",
+            "description": "Necessite un CRA en statut SUBMITTED."
+          },
+          "response": []
+        },
+        {
+          "name": "Rejeter CRA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motif\": \"Justificatifs incomplets\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/admin/cra/{{cra_id}}/rejeter",
+            "description": "Necessite un CRA en statut SUBMITTED."
+          },
+          "response": []
+        },
+        {
+          "name": "Invalider CRA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motif\": \"Correction demandee\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/admin/cra/{{cra_id}}/invalider",
+            "description": "Necessite un CRA en statut APPROVED."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@cbx.com"
+    },
+    {
+      "key": "admin_password",
+      "value": "admin123"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "admin_role",
+      "value": ""
+    },
+    {
+      "key": "collaborateur_email",
+      "value": "collab.test@cbx.com"
+    },
+    {
+      "key": "collaborateur_password",
+      "value": ""
+    },
+    {
+      "key": "collaborateur_token",
+      "value": ""
+    },
+    {
+      "key": "collaborateur_role",
+      "value": ""
+    },
+    {
+      "key": "collaborateur_id",
+      "value": ""
+    },
+    {
+      "key": "mission_id",
+      "value": ""
+    },
+    {
+      "key": "cra_id",
+      "value": ""
+    },
+    {
+      "key": "mois",
+      "value": "3"
+    },
+    {
+      "key": "annee",
+      "value": "2026"
+    },
+    {
+      "key": "jour_date",
+      "value": "2026-03-24"
+    }
+  ]
+}
