@@ -7,16 +7,17 @@ import com.orace.cra.domain.model.enums.Role;
 import com.orace.cra.domain.model.repository.UserRepository;
 import com.orace.cra.execptions.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CollaborateurService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<CollaborateurResponse> getAll() {
         return userRepository.findAll().stream()
@@ -34,6 +35,9 @@ public class CollaborateurService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email déjà utilisé");
         }
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new BusinessException("Le mot de passe du collaborateur est obligatoire");
+        }
         User user = new User();
         user.setNom(request.getNom());
         user.setPrenom(request.getPrenom());
@@ -43,7 +47,7 @@ public class CollaborateurService {
         user.setSalaire(request.getSalaire());
         user.setRole(Role.COLLABORATEUR);
         user.setActif(true);
-        user.setPassword(UUID.randomUUID().toString());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return toResponse(userRepository.save(user));
     }
 
@@ -84,5 +88,4 @@ public class CollaborateurService {
                 .build();
     }
 }
-
 

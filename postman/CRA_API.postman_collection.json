@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "55885cef-8a3d-4882-a98e-ab14ad7e322d",
     "name": "CRA API - Complete Tests",
-    "description": "Collection complete des endpoints CRA.\n\nPre-requis importants:\n1) Connecte-toi d'abord avec 'Login Admin' pour remplir {{admin_token}} automatiquement.\n2) Les endpoints /api/cra/** exigent un token ROLE_COLLABORATEUR ({{collaborateur_token}}).\n3) Regle metier: la saisie CRA (remplir/update/soumettre) est autorisee uniquement entre le 22 et le 28 (timezone Europe/Paris), sauf cas REJECTED.\n4) L'endpoint de creation collaborateur ne renvoie pas de mot de passe utilisable pour login: renseigne manuellement {{collaborateur_token}} si besoin, ou configure un compte collaborateur de test dans la base.",
+    "description": "Collection complete des endpoints CRA.\n\nPre-requis importants:\n1) Connecte-toi d'abord avec 'Login Admin' pour remplir {{admin_token}} automatiquement.\n2) Les endpoints /api/cra/** exigent un token ROLE_COLLABORATEUR ({{collaborateur_token}}).\n3) Regle metier: la saisie CRA (remplir/update/soumettre) est autorisee uniquement entre le 22 et le 28 (timezone Europe/Paris), sauf cas REJECTED.\n4) Lors de la creation d'un collaborateur, renseigne {{collaborateur_password}}: ce mot de passe pourra ensuite etre utilise pour le login collaborateur.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -113,7 +113,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.environment.set('collaborateur_email', 'collab.' + Date.now() + '@cbx.com');"
+                  "pm.environment.set('collaborateur_email', 'collab.' + Date.now() + '@cbx.com');",
+                  "if (!pm.environment.get('collaborateur_password')) {",
+                  "  pm.environment.set('collaborateur_password', 'Collab123!');",
+                  "}"
                 ]
               }
             },
@@ -145,7 +148,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Jean\",\n  \"email\": \"{{collaborateur_email}}\",\n  \"contrat\": \"CDI\",\n  \"seniorite\": \"JUNIOR\",\n  \"salaire\": \"35000\"\n}",
+              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Jean\",\n  \"email\": \"{{collaborateur_email}}\",\n  \"password\": \"{{collaborateur_password}}\",\n  \"contrat\": \"CDI\",\n  \"seniorite\": \"JUNIOR\",\n  \"salaire\": \"35000\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

@@ -16,6 +16,7 @@ public class CollaborateurRequest {
     @Email
     @NotBlank
     private String email;
+    private String password;
     private ContratType contrat;
     private Seniorite seniorite;
     private String salaire;
