@@ -197,6 +197,7 @@ public class CraService {
     private boolean estDansFenetreDeclaration() {
         int jour = LocalDate.now(ZoneId.of("Europe/Paris")).getDayOfMonth();
         return jour >= 22 && jour <= 28;
+       // return true;
     }
 
     private CraResponse toResponse(Cra cra) {
