@@ -97,6 +97,19 @@ Ajouter le header suivant à toutes les requêtes :
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 ```
 
+**3. Se déconnecter**
+```http
+POST /api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+```
+
+**Réponse :**
+```json
+{
+  "message": "Déconnexion réussie"
+}
+```
+
 ---
 
 ## Endpoints
@@ -105,6 +118,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 | Méthode | Route | Description | Accès |
 |---|---|---|---|
 | POST | `/api/auth/login` | Se connecter | Public |
+| POST | `/api/auth/logout` | Se déconnecter (retourne un message) | Authentifié |
 
 ### Collaborateurs
 | Méthode | Route | Description | Accès |
@@ -113,7 +127,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 | GET | `/api/collaborateurs/{id}` | Récupérer un collaborateur | Admin |
 | POST | `/api/collaborateurs` | Créer un collaborateur | Admin |
 | PUT | `/api/collaborateurs/{id}` | Modifier un collaborateur | Admin |
-| PATCH | `/api/collaborateurs/{id}/activation` | Activer / désactiver | Admin |
+| PATCH | `/api/collaborateurs/{id}/activation` | Activer / désactiver (retourne le collaborateur mis à jour) | Admin |
 
 ### Missions
 | Méthode | Route | Description | Accès |
@@ -122,8 +136,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 | GET | `/api/missions/{id}` | Récupérer une mission | Admin |
 | POST | `/api/missions` | Créer une mission | Admin |
 | PUT | `/api/missions/{id}` | Modifier une mission | Admin |
-| DELETE | `/api/missions/{id}` | Supprimer une mission | Admin |
-| POST | `/api/missions/assign` | Affecter un collaborateur | Admin |
+| DELETE | `/api/missions/{id}` | Supprimer une mission (retourne un message) | Admin |
+| POST | `/api/missions/assign` | Affecter un collaborateur (retourne l'affectation créée) | Admin |
 
 ### CRA — Collaborateur
 | Méthode | Route | Description | Accès |

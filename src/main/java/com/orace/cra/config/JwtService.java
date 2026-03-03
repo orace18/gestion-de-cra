@@ -30,12 +30,11 @@ public class JwtService {
     }
 
     public String extractEmail(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return extractClaims(token).getSubject();
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -44,13 +43,15 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private io.jsonwebtoken.Claims extractClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration()
-                .before(new Date());
+                .getPayload();
     }
 
     private SecretKey getSigningKey() {

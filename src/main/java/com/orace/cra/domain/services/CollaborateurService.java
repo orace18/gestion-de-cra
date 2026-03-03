@@ -61,10 +61,10 @@ public class CollaborateurService {
         return toResponse(userRepository.save(user));
     }
 
-    public void toggleActivation(Long id) {
+    public CollaborateurResponse toggleActivation(Long id) {
         User user = findCollaborateur(id);
         user.setActif(!user.isActif());
-        userRepository.save(user);
+        return toResponse(userRepository.save(user));
     }
 
 
@@ -88,4 +88,3 @@ public class CollaborateurService {
                 .build();
     }
 }
-

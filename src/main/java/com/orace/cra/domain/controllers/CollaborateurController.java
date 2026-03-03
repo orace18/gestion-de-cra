@@ -64,13 +64,11 @@ public class CollaborateurController {
 
     @Operation(summary = "Activer / désactiver un collaborateur")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Statut modifié"),
+            @ApiResponse(responseCode = "200", description = "Statut modifié"),
             @ApiResponse(responseCode = "400", description = "Collaborateur introuvable")
     })
     @PatchMapping("/{id}/activation")
-    public ResponseEntity<Void> toggleActivation(@PathVariable Long id) {
-        collaborateurService.toggleActivation(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<CollaborateurResponse> toggleActivation(@PathVariable Long id) {
+        return ResponseEntity.ok(collaborateurService.toggleActivation(id));
     }
 }
-

@@ -2,6 +2,8 @@ package com.orace.cra.domain.services;
 
 import com.orace.cra.domain.model.dtos.request.AssignmentRequest;
 import com.orace.cra.domain.model.dtos.request.MissionRequest;
+import com.orace.cra.domain.model.dtos.response.ActionResponse;
+import com.orace.cra.domain.model.dtos.response.AssignmentResponse;
 import com.orace.cra.domain.model.dtos.response.MissionResponse;
 import com.orace.cra.domain.model.entities.Assignment;
 import com.orace.cra.domain.model.entities.Mission;
@@ -55,11 +57,14 @@ public class MissionService {
         return toResponse(missionRepository.save(mission));
     }
 
-    public void delete(Long id) {
+    public ActionResponse delete(Long id) {
         missionRepository.delete(findMission(id));
+        return ActionResponse.builder()
+                .message("Mission supprimée avec succès")
+                .build();
     }
 
-    public void assign(AssignmentRequest request) {
+    public AssignmentResponse assign(AssignmentRequest request) {
         User collaborateur = userRepository.findById(request.getCollaborateurId())
                 .orElseThrow(() -> new BusinessException("Collaborateur introuvable"));
         Mission mission = findMission(request.getMissionId());
@@ -69,7 +74,8 @@ public class MissionService {
         assignment.setMission(mission);
         assignment.setDateDebut(request.getDateDebut());
         assignment.setDateFin(request.getDateFin());
-        assignmentRepository.save(assignment);
+        Assignment saved = assignmentRepository.save(assignment);
+        return toResponse(saved);
     }
 
 
@@ -88,6 +94,19 @@ public class MissionService {
                 .dateDebut(m.getDateDebut())
                 .dateFin(m.getDateFin())
                 .tjm(m.getTjm())
+                .build();
+    }
+
+    private AssignmentResponse toResponse(Assignment assignment) {
+        return AssignmentResponse.builder()
+                .id(assignment.getId())
+                .collaborateurId(assignment.getCollaborateur().getId())
+                .collaborateurNom(assignment.getCollaborateur().getNom())
+                .collaborateurPrenom(assignment.getCollaborateur().getPrenom())
+                .missionId(assignment.getMission().getId())
+                .missionTitre(assignment.getMission().getTitre())
+                .dateDebut(assignment.getDateDebut())
+                .dateFin(assignment.getDateFin())
                 .build();
     }
 }

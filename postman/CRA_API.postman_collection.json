@@ -85,6 +85,68 @@
             "description": "Recupere et stocke automatiquement {{collaborateur_token}}."
           },
           "response": []
+        },
+        {
+          "name": "Logout Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payload contient message', function () { pm.expect(data).to.have.property('message'); });",
+                  "pm.environment.unset('admin_token');",
+                  "pm.environment.unset('admin_role');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/logout",
+            "description": "Invalide le token admin courant puis nettoie les variables d'environnement."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout Collaborateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payload contient message', function () { pm.expect(data).to.have.property('message'); });",
+                  "pm.environment.unset('collaborateur_token');",
+                  "pm.environment.unset('collaborateur_role');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/logout",
+            "description": "Invalide le token collaborateur courant puis nettoie les variables d'environnement."
+          },
+          "response": []
         }
       ]
     },
@@ -202,6 +264,20 @@
         },
         {
           "name": "Toggle Activation Collaborateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payload contient actif', function () { pm.expect(data).to.have.property('actif'); });"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -317,6 +393,20 @@
         },
         {
           "name": "Affecter Mission a Collaborateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data.id) { pm.environment.set('assignment_id', String(data.id)); }"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -344,6 +434,21 @@
         },
         {
           "name": "Supprimer Mission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payload contient message', function () { pm.expect(data).to.have.property('message'); });",
+                  "pm.environment.unset('mission_id');"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [

@@ -2,6 +2,8 @@ package com.orace.cra.domain.controllers;
 
 import com.orace.cra.domain.model.dtos.request.AssignmentRequest;
 import com.orace.cra.domain.model.dtos.request.MissionRequest;
+import com.orace.cra.domain.model.dtos.response.ActionResponse;
+import com.orace.cra.domain.model.dtos.response.AssignmentResponse;
 import com.orace.cra.domain.model.dtos.response.MissionResponse;
 import com.orace.cra.domain.services.MissionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,13 +67,12 @@ public class MissionController {
 
     @Operation(summary = "Supprimer une mission")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Mission supprimée"),
+            @ApiResponse(responseCode = "200", description = "Mission supprimée"),
             @ApiResponse(responseCode = "400", description = "Mission introuvable")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        missionService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ActionResponse> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(missionService.delete(id));
     }
 
     @Operation(summary = "Affecter une mission à un collaborateur")
@@ -80,8 +81,7 @@ public class MissionController {
             @ApiResponse(responseCode = "400", description = "Collaborateur ou mission introuvable")
     })
     @PostMapping("/assign")
-    public ResponseEntity<Void> assign(@RequestBody @Valid AssignmentRequest request) {
-        missionService.assign(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<AssignmentResponse> assign(@RequestBody @Valid AssignmentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(missionService.assign(request));
     }
 }
