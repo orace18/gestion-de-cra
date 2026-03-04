@@ -1,6 +1,7 @@
 package com.orace.cra.domain.controllers;
 
 
+import com.orace.cra.domain.model.dtos.request.RemplirMoisRequest;
 import com.orace.cra.domain.model.dtos.response.AbsenceSummaryResponse;
 import com.orace.cra.domain.model.dtos.response.CraResponse;
 import com.orace.cra.domain.model.dtos.request.CraValidationRequest;
@@ -144,5 +145,15 @@ public class CraController {
             @PathVariable Long id,
             @RequestParam int annee) {
         return ResponseEntity.ok(craService.getAbsencesCollaborateur(id, annee));
+    }
+
+    @Operation(summary = "Remplir le CRA avec un tableau de jours complet")
+    @PutMapping("/cra/{id}/remplir")
+    public ResponseEntity<CraResponse> remplirAvecJours(
+            @PathVariable Long id,
+            @RequestBody @Valid RemplirMoisRequest request,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(craService.remplirMoisAvecJours(id, user.getId(), request));
     }
 }

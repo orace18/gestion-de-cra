@@ -1,6 +1,7 @@
 package com.orace.cra.domain.services;
 
 
+import com.orace.cra.domain.model.dtos.request.RemplirMoisRequest;
 import com.orace.cra.domain.model.dtos.response.AbsenceResponse;
 import com.orace.cra.domain.model.dtos.response.AbsenceSummaryResponse;
 import com.orace.cra.domain.model.dtos.response.CraDayResponse;
@@ -277,5 +278,46 @@ public class CraService {
                 .totauxParType(totauxParType)
                 .totalJours(totalJours)
                 .build();
+    }
+
+    public CraResponse remplirMoisAvecJours(Long craId, Long userId, RemplirMoisRequest request) {
+        Cra cra = findCraEditable(craId, userId);
+        YearMonth moisCra = YearMonth.of(cra.getAnnee(), cra.getMois());
+
+        request.getJours().forEach(j -> {
+            YearMonth moisJour = YearMonth.from(j.getDate());
+            if (!moisJour.equals(moisCra)) {
+                throw new BusinessException("La date " + j.getDate() + " n'appartient pas au mois du CRA");
+            }
+            if (j.getDate().getDayOfWeek() == DayOfWeek.SATURDAY ||
+                    j.getDate().getDayOfWeek() == DayOfWeek.SUNDAY) {
+                throw new BusinessException("La date " + j.getDate() + " est un week-end");
+            }
+            if (j.getValeur() == null || j.getValeur() <= 0 || j.getValeur() > 1) {
+                throw new BusinessException("La valeur doit être entre 0.5 et 1 pour le " + j.getDate());
+            }
+        });
+
+        long joursOuvresAttendus = moisCra.atDay(1).datesUntil(moisCra.atEndOfMonth().plusDays(1))
+                .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY)
+                .count();
+
+        if (request.getJours().size() != joursOuvresAttendus) {
+            throw new BusinessException("Vous devez renseigner tous les " + joursOuvresAttendus + " jours ouvrés du mois");
+        }
+
+
+        List<CraDay> jours = request.getJours().stream().map(j -> {
+            CraDay craDay = new CraDay();
+            craDay.setCra(cra);
+            craDay.setDate(j.getDate());
+            craDay.setType(j.getType());
+            craDay.setValeur(j.getValeur());
+            return craDay;
+        }).toList();
+
+        cra.getJours().clear();
+        cra.getJours().addAll(jours);
+        return toResponse(craRepository.save(cra));
     }
 }

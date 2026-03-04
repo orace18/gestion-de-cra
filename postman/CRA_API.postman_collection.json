@@ -594,6 +594,69 @@
       ]
     },
     {
+      "name": "35 - Absences",
+      "item": [
+        {
+          "name": "Mes absences (Collaborateur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payload contient annee', function () { pm.expect(data).to.have.property('annee'); });",
+                  "pm.test('Payload contient absences', function () { pm.expect(data).to.have.property('absences'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/cra/mes-absences?annee={{annee}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Absences collaborateur (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payload contient collaborateurId', function () { pm.expect(data).to.have.property('collaborateurId'); });",
+                  "pm.test('Payload contient totalJours', function () { pm.expect(data).to.have.property('totalJours'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/collaborateurs/{{collaborateur_id}}/absences?annee={{annee}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "40 - CRA Admin Validation",
       "item": [
         {
