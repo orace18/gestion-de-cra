@@ -1,6 +1,7 @@
 package com.orace.cra.domain.controllers;
 
 
+import com.orace.cra.domain.model.dtos.response.AbsenceSummaryResponse;
 import com.orace.cra.domain.model.dtos.response.CraResponse;
 import com.orace.cra.domain.model.dtos.request.CraValidationRequest;
 import com.orace.cra.domain.model.dtos.request.RemplirJourRequest;
@@ -126,5 +127,22 @@ public class CraController {
             @PathVariable Long id,
             @RequestBody CraValidationRequest request) {
         return ResponseEntity.ok(craService.invalider(id, request));
+    }
+
+    @Operation(summary = "Récupérer mes absences sur une année")
+    @GetMapping("/cra/mes-absences")
+    public ResponseEntity<AbsenceSummaryResponse> getMesAbsences(
+            @RequestParam int annee,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(craService.getMesAbsences(user.getId(), annee));
+    }
+
+    @Operation(summary = "Récupérer les absences d'un collaborateur (Admin)")
+    @GetMapping("/admin/collaborateurs/{id}/absences")
+    public ResponseEntity<AbsenceSummaryResponse> getAbsencesCollaborateur(
+            @PathVariable Long id,
+            @RequestParam int annee) {
+        return ResponseEntity.ok(craService.getAbsencesCollaborateur(id, annee));
     }
 }

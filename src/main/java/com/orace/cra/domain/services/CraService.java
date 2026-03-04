@@ -1,6 +1,8 @@
 package com.orace.cra.domain.services;
 
 
+import com.orace.cra.domain.model.dtos.response.AbsenceResponse;
+import com.orace.cra.domain.model.dtos.response.AbsenceSummaryResponse;
 import com.orace.cra.domain.model.dtos.response.CraDayResponse;
 import com.orace.cra.domain.model.dtos.response.CraResponse;
 import com.orace.cra.domain.model.dtos.request.CraValidationRequest;
@@ -22,7 +24,10 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -196,7 +201,7 @@ public class CraService {
 
     private boolean estDansFenetreDeclaration() {
         int jour = LocalDate.now(ZoneId.of("Europe/Paris")).getDayOfMonth();
-        return jour >= 22 && jour <= 28;
+        return jour >= 03 && jour <= 28;
        // return true;
     }
 
@@ -219,6 +224,58 @@ public class CraService {
                 .collaborateurNom(cra.getCollaborateur().getNom())
                 .collaborateurPrenom(cra.getCollaborateur().getPrenom())
                 .jours(jours)
+                .build();
+    }
+
+    public AbsenceSummaryResponse getMesAbsences(Long userId, int annee) {
+        User collaborateur = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Collaborateur introuvable"));
+
+        return buildAbsenceSummary(collaborateur, annee);
+    }
+
+    public AbsenceSummaryResponse getAbsencesCollaborateur(Long collaborateurId, int annee) {
+        User collaborateur = userRepository.findById(collaborateurId)
+                .orElseThrow(() -> new BusinessException("Collaborateur introuvable"));
+
+        return buildAbsenceSummary(collaborateur, annee);
+    }
+
+    private AbsenceSummaryResponse buildAbsenceSummary(User collaborateur, int annee) {
+        List<Cra> cras = craRepository.findByCollaborateurIdAndAnnee(collaborateur.getId(), annee);
+
+        List<AbsenceResponse> absences = cras.stream()
+                .flatMap(cra -> cra.getJours().stream()
+                        .filter(j -> j.getType() != DayType.TRAVAILLE)
+                        .map(j -> AbsenceResponse.builder()
+                                .craDayId(j.getId())
+                                .date(j.getDate())
+                                .type(j.getType())
+                                .valeur(j.getValeur())
+                                .mois(cra.getMois())
+                                .annee(cra.getAnnee())
+                                .build()))
+                .sorted(Comparator.comparing(AbsenceResponse::getDate))
+                .toList();
+
+        Map<String, Double> totauxParType = absences.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getType().name(),
+                        Collectors.summingDouble(AbsenceResponse::getValeur)
+                ));
+
+        Double totalJours = absences.stream()
+                .mapToDouble(AbsenceResponse::getValeur)
+                .sum();
+
+        return AbsenceSummaryResponse.builder()
+                .collaborateurId(collaborateur.getId())
+                .collaborateurNom(collaborateur.getNom())
+                .collaborateurPrenom(collaborateur.getPrenom())
+                .annee(annee)
+                .absences(absences)
+                .totauxParType(totauxParType)
+                .totalJours(totalJours)
                 .build();
     }
 }

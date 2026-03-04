@@ -13,6 +13,7 @@ public interface CraRepository extends JpaRepository<Cra, Long> {
     Optional<Cra> findByCollaborateurIdAndMoisAndAnnee(Long userId, int mois, int annee);
     List<Cra> findByStatut(CraStatus statut);
     List<Cra> findByCollaborateurId(Long userId);
+    List<Cra> findByCollaborateurIdAndAnnee(Long collaborateurId, int annee);
 
     List<Cra> findByStatutIn(List<CraStatus> statuts);
 }
