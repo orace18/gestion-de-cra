@@ -12,7 +12,7 @@ API REST backend pour la gestion des Comptes Rendus d'Activité (CRA) des consul
 | Spring Boot | 3.5.11 | Framework principal |
 | Spring Security | 6.x | Authentification & autorisation |
 | Spring Data JPA | 3.x | Accès base de données |
-| H2 | Embarquée | Base de données (dev) |
+| PostgreSQL | 15+ | Base de données principale |
 | jjwt | 0.12.6 | Génération et validation JWT |
 | springdoc-openapi | 2.5.0 | Documentation Swagger |
 | Lombok | Latest | Réduction du boilerplate |
@@ -24,6 +24,7 @@ API REST backend pour la gestion des Comptes Rendus d'Activité (CRA) des consul
 ### Prérequis
 - Java 21+
 - Maven 3.8+
+- PostgreSQL 15+ (ou compatible)
 
 ### Démarrage
 
@@ -31,6 +32,13 @@ API REST backend pour la gestion des Comptes Rendus d'Activité (CRA) des consul
 # Cloner le projet
 git clone https://github.com/orace18/gestion-de-cra.git
 cd cra
+
+# Variables de connexion PostgreSQL (optionnel si valeurs par défaut)
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_NAME=cra_db
+export DB_USERNAME=postgres
+export DB_PASSWORD=postgres
 
 # Lancer l'application
 ./mvnw spring-boot:run
@@ -46,12 +54,6 @@ L'application démarre sur `http://localhost:8080`
 | URL | Description |
 |---|---|
 | `http://localhost:8080/swagger-ui.html` | Documentation interactive de l'API |
-| `http://localhost:8080/h2-console` | Console base de données H2 |
-
-**Connexion H2 console :**
-- JDBC URL : `jdbc:h2:mem:cra_db`
-- Username : `sa`
-- Password : *(vide)*
 
 ---
 

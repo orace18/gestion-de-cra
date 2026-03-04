@@ -31,7 +31,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/logout").authenticated()
-                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/collaborateurs/**").hasRole("ADMIN")
@@ -39,8 +38,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/cra/**").hasRole("COLLABORATEUR")
                         .anyRequest().authenticated()
                 )
-                .headers(headers ->
-                        headers.frameOptions(frame -> frame.disable()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
