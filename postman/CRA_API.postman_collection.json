@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "55885cef-8a3d-4882-a98e-ab14ad7e322d",
     "name": "CRA API - Complete Tests",
-    "description": "Collection complete des endpoints CRA.\n\nPre-requis importants:\n1) Connecte-toi d'abord avec 'Login Admin' pour remplir {{admin_token}} automatiquement.\n2) Les endpoints /api/cra/** exigent un token ROLE_COLLABORATEUR ({{collaborateur_token}}).\n3) Regle metier: la saisie CRA (remplir/update/soumettre) est autorisee uniquement entre le 22 et le 28 (timezone Europe/Paris), sauf cas REJECTED.\n4) Lors de la creation d'un collaborateur, renseigne {{collaborateur_password}}: ce mot de passe pourra ensuite etre utilise pour le login collaborateur.",
+    "description": "Collection complete des endpoints CRA.\n\nPre-requis importants:\n1) Connecte-toi d'abord avec 'Login Admin' pour remplir {{admin_token}} automatiquement.\n2) Les endpoints /api/cra/** exigent un token ROLE_COLLABORATEUR ({{collaborateur_token}}).\n3) Regle metier: la saisie CRA (remplir/update/soumettre) est autorisee uniquement dans la fenetre de declaration configuree cote backend (timezone Europe/Paris), sauf cas REJECTED.\n4) Lors de la creation d'un collaborateur, renseigne {{collaborateur_password}}: ce mot de passe pourra ensuite etre utilise pour le login collaborateur.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -519,12 +519,12 @@
               }
             ],
             "url": "{{baseUrl}}/api/cra/{{cra_id}}/remplir-mois",
-            "description": "Regle metier: possible entre le 22 et le 28 (Europe/Paris), sauf statut REJECTED."
+            "description": "Aucun body. Remplit les jours ouvres en TRAVAILLE=1.0. Possible uniquement dans la fenetre de declaration configuree cote backend (sauf statut REJECTED)."
           },
           "response": []
         },
         {
-          "name": "Update Jour CRA",
+          "name": "Update Jour CRA (TRAVAILLE)",
           "request": {
             "method": "PUT",
             "header": [
@@ -540,6 +540,33 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"date\": \"{{jour_date}}\",\n  \"type\": \"TRAVAILLE\",\n  \"valeur\": 1.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/cra/{{cra_id}}/jour"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Jour CRA (CONGE)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collaborateur_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"{{jour_absence_date}}\",\n  \"type\": \"CONGE\",\n  \"valeur\": 1.0\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -698,7 +725,7 @@
     },
     {
       "key": "collaborateur_password",
-      "value": ""
+      "value": "Collab123!"
     },
     {
       "key": "collaborateur_token",
@@ -717,6 +744,10 @@
       "value": ""
     },
     {
+      "key": "assignment_id",
+      "value": ""
+    },
+    {
       "key": "cra_id",
       "value": ""
     },
@@ -731,6 +762,10 @@
     {
       "key": "jour_date",
       "value": "2026-03-24"
+    },
+    {
+      "key": "jour_absence_date",
+      "value": "2026-03-25"
     }
   ]
 }

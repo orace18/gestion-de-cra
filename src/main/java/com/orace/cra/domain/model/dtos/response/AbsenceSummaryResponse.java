@@ -1,10 +1,7 @@
 package com.orace.cra.domain.model.dtos.response;
 
-
-
 import lombok.Builder;
 import lombok.Data;
-
 import java.util.List;
 import java.util.Map;
 
